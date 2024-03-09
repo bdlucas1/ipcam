@@ -1,0 +1,14 @@
+[Unit]
+Description=ipcam
+After=multi-user.target
+
+[Service]
+User=root
+WorkingDirectory=/tmp
+ExecStart=/usr/bin/ipcam.py
+StandardOutput=journal
+StandardError=inherit
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
