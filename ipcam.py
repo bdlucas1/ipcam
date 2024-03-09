@@ -2,35 +2,27 @@
 
 import os
 import io
-import time
 import http.server
-import RPi.GPIO as GPIO
 import PIL
 import libcamera # sudo apt install python3-libcamera
 import picamera2 # sudo apt install python3-picamera2
 
 #https://datasheets.raspberrypi.com/camera/picamera2-manual.pdf
 
-light_pin = 4
+port = 8000
 
 class Server(http.server.ThreadingHTTPServer):
 
     def __init__(self):
 
         # set up http listern
-        super().__init__(('', 8000), Handler)
+        super().__init__(('', port), Handler)
 
         # suppress logging
         os.environ["LIBCAMERA_LOG_LEVELS"] = "3"
 
         # create camera object
         self.camera = picamera2.Picamera2()
-
-        # turn lights off
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(light_pin, GPIO.OUT)
-        GPIO.output(light_pin, 0)
-        self.active_clients = 0
 
         # find uncropped sizes
         sizes = []
@@ -74,13 +66,6 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-type", "multipart/x-mixed-replace; boundary=frame")
             self.end_headers()
 
-            # turn light on
-            server.active_clients += 1
-            print(f"{server.active_clients} active clients")
-            if server.active_clients:
-                print("turning light on")
-                GPIO.output(light_pin, 1)
-
             while True:
                 array = server.camera.capture_array("main")
                 img = PIL.Image.fromarray(array)
@@ -94,13 +79,6 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     print("client went away")
                     break
 
-            # last one out turn the light off
-            server.active_clients -= 1
-            print(f"{server.active_clients} active clients")
-            if not server.active_clients:
-                print("turning light off")
-                GPIO.output(light_pin, 0)
-
         else:
                 
             self.send_response(404)
@@ -109,4 +87,3 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
 server = Server()
 server.serve_forever()
-
