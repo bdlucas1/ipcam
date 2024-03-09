@@ -2,7 +2,7 @@ Basic IP camera for Raspberry Pi. Tested only with Rasperry Pi 4 and Camera Modu
 
 To install:
 
-    sudo cp ipcam.py /usr/lib
+    sudo cp ipcam.py /usr/bin
     sudo cp ipcam.service /lib/systemd/system
     sudo systemctl enable ipcam.service
     sudo systemctl restart ipcam.service
