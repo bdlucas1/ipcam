@@ -7,6 +7,6 @@ To install:
     sudo systemctl enable ipcam.service
     sudo systemctl restart ipcam.service
 
-Point browser at http://<hostname>:8000.
+Point browser at http://myhostname.local:8000.
 
 CAUTION: provides no security whatsoever. Anyone with access to the network that the Pi is on can view.
